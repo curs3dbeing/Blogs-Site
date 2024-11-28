@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" style="background: black">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tesst</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+        min-height: 100vh;
+        background: black;
+      }
+      .logo {
+        width: 100%;
+        height: auto;
+        transition: filter 0.3s ease;
+      }
+      .logo:hover {
+        filter: invert(70%) saturate(5) hue-rotate(290deg);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

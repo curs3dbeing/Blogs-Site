@@ -1,0 +1,8 @@
+.custom-search-button .ant-btn {
+    background-color: #64748B;
+    color: rgb(41 37 36);
+}
+
+.custom-search-button:hover .ant-btn:hover {
+    background-color: #cfbfbe;
+}
