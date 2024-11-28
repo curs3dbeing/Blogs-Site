@@ -12,7 +12,6 @@ from mainpy.src.security.security import create_access_token
 
 class Token(BaseModel):
     access_token: str
-    #refresh_token: str
     token_type: str
 
 token_router = APIRouter()
