@@ -11,7 +11,7 @@ comments_router = APIRouter()
 
 @comments_router.post('/post_comment/{post_id}')
 async def create_comment(comment: CommentInfo,
-                         post_id: UUID=Path(),
+                         post_id: UUID,
                           current_user: User = Depends(get_current_active_user_model)):
     try:
         comment.author=current_user.id

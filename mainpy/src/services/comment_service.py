@@ -22,7 +22,7 @@ def add_comment(comment: CommentInfo, post_id: UUID):
 
 def get_comments(post_id: UUID, offset : int) -> tuple[int, List[CommentInfo]]:
     connection = database.connect()
-    offset=offset-1
+    offset=(offset-1)*5
     query = text("SELECT t1.comment_id as id,comment as context, author, comment_created_at, author_username FROM comments as t1 "
                  "LEFT JOIN comment_post as t2 using(comment_id) "
                  "WHERE t2.post_id = '{0}' "
