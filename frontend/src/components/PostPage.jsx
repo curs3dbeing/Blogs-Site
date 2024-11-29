@@ -1,4 +1,4 @@
-import { Layout, Spin } from "antd";
+import {Layout, message, Spin} from "antd";
 import Sider from "antd/es/layout/Sider.js";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ const PostPage = () => {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const allTags = localStorage.getItem('tags')
+    const allTags = localStorage.getItem('tags');
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -37,9 +37,9 @@ const PostPage = () => {
                 {}
             </Sider>
             <Layout style={{ marginLeft: 50 }}>
-                <Content style={{minHeight: '100vh', padding: '24px', marginTop: 24 }}>
+                <Content style={{ padding: '24px', marginTop: 24 }}>
                     {post ? (
-                        <div style={{fontFamily: "Rubik", minHeight: '100vh'}}>
+                        <div style={{fontFamily: "Rubik", minHeight: 'fit-content'}}>
                             <h1>{post.title}</h1>
                             <p className="font-bold" style={{fontSize: '20px'}}>Тэги:
                                 {post.tags && post.tags.length > 0 ? (
