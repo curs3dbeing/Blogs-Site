@@ -1,4 +1,4 @@
-import {Layout, message, Spin} from "antd";
+import {Layout, message, Spin, Divider } from "antd";
 import Sider from "antd/es/layout/Sider.js";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
@@ -48,12 +48,14 @@ const PostPage = () => {
                                             <span key={tag.id}>
                         {" " + tag.tag_name}{index < post.tags.length - 1 ? ', ' : '.'}
                     </span>
+
                                         ))}
                                     </>
                                 ) : (
                                     <span> нет тегов.</span>
                                 )}
                             </p>
+
                             <div dangerouslySetInnerHTML={{__html: post.content}}/>
 
                         </div>

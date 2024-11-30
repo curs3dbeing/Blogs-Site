@@ -10,6 +10,7 @@ import MainPage from './MainPage' ;
 import Register from './Register';
 import PostPage from "./components/PostPage.jsx";
 import PostCreation from "./components/PostCreation.jsx";
+import ProfilePage from "./components/ProfilePage.jsx";
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
                   <Route path="/login" element={<Login />}/>
                   <Route path="/posts" element={<MainPage/>}/>
                   <Route path="/new_post" element={<PostCreation/>}/>
+                  <Route path={"/profile/:userId"} element={<ProfilePage/>}/>
               </Routes>
           </Layout.Content>
       </Content>

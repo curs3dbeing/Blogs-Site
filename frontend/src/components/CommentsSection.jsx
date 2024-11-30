@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {Pagination, Spin, Input, message, Button} from 'antd';
+import {Pagination, Spin, Input, message, Button, Divider} from 'antd';
 import qs from "qs";
 import useAuth from "../hooks/useAuth.jsx";
 const { TextArea } = Input;
@@ -40,6 +40,7 @@ const CommentsSection = ({ postId }) => {
             });
             setComment('');
             const successMessage = 'Комментарий добавлен';
+            localStorage.setItem('successMessage', successMessage);
             messageApi.open({
                 type: 'success',
                 content: successMessage,
@@ -84,20 +85,41 @@ const CommentsSection = ({ postId }) => {
 
 
     useEffect(() => {
+        const successMessage = localStorage.getItem('successMessage');
+        if (successMessage) {
+            messageApi.open({
+                type: 'success',
+                content: successMessage,
+            })
+        }
+
         fetchComments(currentPage);
     }, [postId, currentPage]);
 
     if (loading) return <Spin size="large" />;
 
     return (
-        <div className="p-6" style={{fontFamily: "Rubik"}}>
+        <div className="p-1" style={{fontFamily: "Rubik"}}>
             {contextHolder}
+            <div className="w-10/12">
+                <Divider
+                    style={{
+                        borderColor: '#000000'
+                    }}></Divider>
+            </div>
             <h2 className="text-xl font-bold">Комментарии:</h2>
+
             {comments.length > 0 ? (
-                comments.map((comment, index) => (
-                    <div key={comment.id} className="border-b border-gray-200 py-4">
-                        <h3 className="px-5"> {comment.author_username}</h3>
-                        <pre className="text-lg">{`${(currentPage - 1) * commentsPerPage + index + 1}. ${comment.context}`}</pre>
+                comments.map((comment) => (
+                    <div key={comment.id} className="border-b border-gray-200 py-2">
+                        <a href={`/profile/${comment.author}`} className="px-5"> {comment.author_username}</a>
+                        <pre className="">{`${comment.context}`}</pre>
+                        <div className="w-10/12">
+                            <Divider
+                                style={{
+                                borderColor: '#000000'
+                            }}></Divider>
+                        </div>
                     </div>
                 ))
             ) : (
