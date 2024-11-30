@@ -1,0 +1,21 @@
+.like-container {
+    display: flex;
+}
+
+.like-icon {
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.like-icon:hover {
+    transform: scale(1.5);
+    color: red;
+}
+
+.like-count {
+    transition: margin-left 0.2s ease-in-out;
+}
+
+
+.like-icon:hover + .like-count {
+    margin-left: 10px;
+}

@@ -3,6 +3,7 @@ import axios from 'axios';
 import {Pagination, Spin, Input, message, Button, Divider} from 'antd';
 import qs from "qs";
 import useAuth from "../hooks/useAuth.jsx";
+import {HeartOutlined} from "@ant-design/icons";
 const { TextArea } = Input;
 
 
@@ -19,6 +20,7 @@ const CommentsSection = ({ postId }) => {
     const [authors, setAuthors] = useState([]);
     const {isAuthenticated} = useAuth()
     const token = localStorage.getItem('access_token');
+
 
     const addComment = async () => {
         if (!comment.trim()) {
@@ -104,7 +106,7 @@ const CommentsSection = ({ postId }) => {
             <div className="w-10/12">
                 <Divider
                     style={{
-                        borderColor: '#000000'
+                        borderColor: '#000000', userSelect: 'none'
                     }}></Divider>
             </div>
             <h2 className="text-xl font-bold">Комментарии:</h2>

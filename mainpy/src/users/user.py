@@ -37,6 +37,7 @@ class UserModel(BaseModel):
     email: str
     created_at: datetime = Field(default_factory=datetime.now)
     role: UserRoles
+    about: str | None = None
     disabled: bool = Field(default=False)
 
     @property

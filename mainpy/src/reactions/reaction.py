@@ -10,12 +10,12 @@ from enum import Enum
 
 class ReactionTypes(str, Enum):
     Like : str = 'Like'
-    Dislike : str = 'Dislike'
-    FunnyEmote : str = 'FunnyEmote'
-    SadEmote : str = 'SadEmote'
-    AngerEmote : str = 'AngerEmote'
-    Heart : str = 'Heart'
-    ShockEmote : str = 'ShockEmote'
+    #Dislike : str = 'Dislike'
+    #FunnyEmote : str = 'FunnyEmote'
+    #SadEmote : str = 'SadEmote'
+    #AngerEmote : str = 'AngerEmote'
+    #Heart : str = 'Heart'
+    #ShockEmote : str = 'ShockEmote'
 
 
 class Reaction(BaseModel):

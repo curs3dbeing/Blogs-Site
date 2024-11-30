@@ -8,10 +8,10 @@ def already_reacted_to_post(post_id: UUID,
                             reaction: Reaction,
                             user_id: UUID) -> bool:
     connection= database.connect()
-    query=text("SELECT * FROM post_user_reaction WHERE post_id='{0}', user_id='{1}', reaction_id='{2}'".format(post_id, user_id, reaction.id))
+    query=text("SELECT * FROM post_user_reaction WHERE post_id='{0}' AND user_id='{1}' AND reaction_id={2}".format(post_id, user_id, reaction.id))
     result = connection.execute(query).one_or_none()
     connection.close()
-    return result != None
+    return result is not None
 
 def get_all_reactions_to_post(post_id:UUID) -> list[AllReactions]:
     connection= database.connect()
@@ -29,11 +29,14 @@ def get_all_reactions_to_post(post_id:UUID) -> list[AllReactions]:
 def add_reaction_to_post(post_id: UUID,
                          reaction: Reaction,
                          user_id: UUID):
-    connection = database.connect()
-    query = text("INSERT INTO post_user_reaction VALUES ('{0}', '{1}', '{2}')".format(post_id,user_id,reaction.id))
-    connection.execute(query)
-    connection.commit()
-    connection.close()
+    if already_reacted_to_post(post_id, reaction, user_id):
+        return
+    else:
+        connection = database.connect()
+        query = text("INSERT INTO post_user_reaction VALUES ('{0}', '{1}', '{2}')".format(post_id,user_id,reaction.id))
+        connection.execute(query)
+        connection.commit()
+        connection.close()
 
 def delete_reaction_from_post(post_id: UUID,
                               reaction: Reaction,

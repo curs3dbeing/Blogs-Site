@@ -33,22 +33,22 @@ const MainPage = () => {
                     borderColor: 'gray',
                     borderStyle: '1px'
                 }}>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center" style={{userSelect: 'none'}}>
                         <div className="w-10/12 p-2">
                             <TagChooser onTagsChange={setSelectedTags}/>
                         </div>
                     </div>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center" style={{userSelect: 'none'}}>
                         <div className="w-10/12 p-2">
                             <DateRange onDateChange={setDateRange}/>
                         </div>
                     </div>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center" style={{userSelect: 'none'}}>
                         <div className="w-10/12 p-2">
                             <InputSearch searchQuery={setSearchQuery}/>
                         </div>
                     </div>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center" style={{userSelect: 'none'}}>
                         <div className="w-full p-2">
                             <SortSelect onSortChange={setSortViewsType} />
                         </div>

@@ -67,7 +67,7 @@ const AppHeader = () => {
 
     if (!isAuthenticated) {
         return (
-            <Header style={{ background: '#ffffff'}}>
+            <Header style={{ background: '#ffffff', userSelect: 'none'}}>
                 <div className="gap-2" style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
                     <a href="/" style={{display: 'inline-block', width: '4%'}}>
                         <img src="/public/drawable/main%20logo2.png" className="flex logo"></img>
@@ -122,7 +122,7 @@ const AppHeader = () => {
     }
 
     return (
-        <Header style={{background: '#ffffff'}}>
+        <Header style={{background: '#ffffff', userSelect: 'none'}}>
             <div className="gap-2" style={{width: '100%', height: '100%', display: 'flex', alignItems: 'center'}}>
                 <a href="/" style={{display: 'inline-block', width: '4%'}}>
                     <img src="/public/drawable/main%20logo2.png" className="flex logo"></img>
@@ -151,7 +151,7 @@ const AppHeader = () => {
                         color: '#000000',
                         fontSize: '20px',
                         fontFamily: 'Rubik'
-                    }}><a href="/profile"> <b> {user?.login} </b> </a></p>
+                    }}><a href={`/profile/${user?.id}`}> <b> {user?.login} </b> </a></p>
                     <a className="inline-flex justify-center rounded-lg text-xl font-semibold py-2.5 px-4 bg-gray-500 text-stone-900 hover:bg-slate-400 hover:shadow-md transition-all -my-2.5 ml-8 hover:text-indigo-500"
                        style={{fontSize: '25px', fontFamily: 'Rubik'}}
                        href="/" onClick={handleLogout}>Выйти</a> {}

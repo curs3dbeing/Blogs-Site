@@ -12,6 +12,9 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 LastModified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 disabled bool default FALSE);
 
+alter table users
+add column about text;
+
 create table users_log(
 id uuid,
 login varchar(30) not null,
