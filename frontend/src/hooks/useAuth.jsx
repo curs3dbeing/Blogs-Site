@@ -19,6 +19,7 @@ const useAuth = () => {
                 })
                 .catch(error => {
                     console.error('Ошибка верификации:', error);
+                    localStorage.removeItem('access_token');
                     setIsAuthenticated(false);
                 })
                 .finally(() => {

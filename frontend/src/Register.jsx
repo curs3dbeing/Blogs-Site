@@ -19,7 +19,6 @@ const Register = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Проверка на пустые поля
         if (!username || !password) {
             setErrorMessage('Пожалуйста, заполните все поля.');
             return;

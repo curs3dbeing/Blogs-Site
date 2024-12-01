@@ -10,7 +10,7 @@ import MainPage from './MainPage' ;
 import Register from './Register';
 import PostPage from "./components/PostPage.jsx";
 import PostCreation from "./components/PostCreation.jsx";
-import ProfilePage from "./components/ProfilePage.jsx";
+import ProfilePage from "./components/UserProfile.jsx";
 
 
 function App() {

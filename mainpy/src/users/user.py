@@ -1,4 +1,4 @@
-from anyio import current_effective_deadline
+
 
 from pydantic import BaseModel, field_validator, Field
 from mainpy.src.security.security import oauth2_scheme
@@ -29,6 +29,7 @@ class User(BaseModel):
     email: str
     created_at: datetime = Field(default_factory=datetime.now)
     role: UserRoles
+    about: str | None = None
     disabled: bool = Field(default=False)
 
 class UserModel(BaseModel):
@@ -88,7 +89,7 @@ async def get_current_user_model(data: Annotated[TokenData, Depends(verify_token
     user : User = get_user_by_id(data.id)
     if user is None:
         raise credentials_exception
-    user_model = UserModel(id=user.id, login=user.login, email=user.email, created_at=user.created_at, role=user.role, disabled=user.disabled)
+    user_model = UserModel(id=user.id, login=user.login, email=user.email, created_at=user.created_at, role=user.role, disabled=user.disabled, about=user.about)
     return user_model
 
 
