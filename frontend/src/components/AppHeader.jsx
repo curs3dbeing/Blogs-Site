@@ -143,6 +143,12 @@ const AppHeader = () => {
                                href="/new_post">Написать публикацию
                             </a>
                         </div>
+                        <div className="flex flex-col items-center">
+                            <a className="text-stone-900 text-xl font-semibold hover:text-indigo-500 content-center"
+                               style={{fontSize: '25px', fontFamily: 'Rubik'}}
+                               href={`/likes/${user?.id}`}>Понравившееся
+                            </a>
+                        </div>
                     </div>
 
                 </div>

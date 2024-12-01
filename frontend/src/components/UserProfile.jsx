@@ -3,6 +3,7 @@ import { Layout, Input, Button, message, Card, Space } from 'antd';
 import axios from 'axios';
 import useAuth from "../hooks/useAuth.jsx";
 import { useParams } from "react-router-dom";
+import UpdateUserDisabled from "./UpdateUserDisabled.jsx";
 
 const UserProfile = () => {
     const { userId } = useParams();
@@ -174,10 +175,12 @@ const UserProfile = () => {
                         ) : (
                             <div style={{ fontFamily: "Rubik" }}>
                                 <Space direction="vertical" size={25}>
-                                    <Card title="Профиль пользователя" style={{ width: 800 }}>
+                                    <Card title="Профиль пользователя" style={{width: 800}}>
                                         <h2>Имя пользователя: {profileData?.login}</h2>
                                         <h2>Дата регистрации: {profileData?.created_at}</h2>
                                         <h2>Информация о себе: {profileData?.about ? profileData.about : 'Пока тут пусто'}</h2>
+                                        <h2>Заблокирован: {profileData?.disabled ? profileData.disabled : 'Нет'} {!profileData?.disabled ? !profileData.disabled : 'Да'}</h2>
+                                        <UpdateUserDisabled isDisabled={profileData.disabled} userID={profileData.id}/>
                                     </Card>
                                 </Space>
                             </div>
@@ -186,10 +189,11 @@ const UserProfile = () => {
                         profileData && (
                             <div style={{ fontFamily: "Rubik" }}>
                                 <Space direction="vertical" size={25}>
-                                    <Card title="Профиль пользователя" style={{ width: 800 }}>
+                                    <Card title="Профиль пользователя" style={{width: 800}}>
                                         <h2>Имя пользователя: {profileData?.login}</h2>
                                         <h2>Дата регистрации: {profileData?.created_at}</h2>
                                         <h2>Информация о себе: {profileData?.about ? profileData.about : 'Пока тут пусто'}</h2>
+                                        <h2>Заблокирован: {profileData?.disabled ? profileData.disabled : 'Нет'} {!profileData?.disabled ? !profileData.disabled : 'Да'}</h2>
                                     </Card>
                                 </Space>
                             </div>

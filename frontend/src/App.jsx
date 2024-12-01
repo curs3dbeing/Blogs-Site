@@ -11,6 +11,7 @@ import Register from './Register';
 import PostPage from "./components/PostPage.jsx";
 import PostCreation from "./components/PostCreation.jsx";
 import ProfilePage from "./components/UserProfile.jsx";
+import LikedPosts from "./components/LikedPosts.jsx";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
                   <Route path="/posts" element={<MainPage/>}/>
                   <Route path="/new_post" element={<PostCreation/>}/>
                   <Route path={"/profile/:userId"} element={<ProfilePage/>}/>
+                  <Route path={"likes/:userId"} element={<LikedPosts/>}/>
               </Routes>
           </Layout.Content>
       </Content>

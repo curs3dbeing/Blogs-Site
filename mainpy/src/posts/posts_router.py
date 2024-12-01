@@ -36,17 +36,16 @@ async def get_author(author:UUID):
 
 @posts_router.delete("/posts_delete/{post_id}")
 async def delete_post(post_id:UUID,
-                      current_user: User = Depends(get_current_active_user)):
+                      current_user: User = Depends(get_current_active_user_model)):
     post : Post=get_post_by_id(post_id)
     if (post.author != current_user.id) & (current_user.role != UserRoles.Moderator) & (current_user.role != UserRoles.Admin):
         return {
             "status" : "You do not have permission to delete this post"
         }
     else:
-        delete_post_by_post(post)
+        delete_post_by_post(post_id)
         return {
-            "status" : "Post deleted",
-            "Post" : post
+            "status" : "Post deleted"
         }
 
 @posts_router.get("/poststags/{post_id}", response_model=PostTags)

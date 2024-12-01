@@ -4,12 +4,12 @@ import {Pagination, Spin, Input, message, Button, Divider} from 'antd';
 import qs from "qs";
 import useAuth from "../hooks/useAuth.jsx";
 import {HeartOutlined} from "@ant-design/icons";
+import DeleteComment from "./DeleteComment.jsx";
 const { TextArea } = Input;
 
 
 const CommentsSection = ({ postId }) => {
     const [messageApi, contextHolder] = message.useMessage();
-
     const [comments, setComments] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [comment, setComment] = useState('');
@@ -23,6 +23,7 @@ const CommentsSection = ({ postId }) => {
 
 
     const addComment = async () => {
+        console.log(comment)
         if (!comment.trim()) {
             messageApi.open({
                 type: 'error',
@@ -115,7 +116,12 @@ const CommentsSection = ({ postId }) => {
                 comments.map((comment) => (
                     <div key={comment.id} className="border-b border-gray-200 py-2">
                         <a href={`/profile/${comment.author}`} className="px-5"> {comment.author_username}</a>
-                        <pre className="">{`${comment.context}`}</pre>
+                        <div className="max-w-5xl" style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word'}}>
+                            {comment.context}
+                            <div className="py-3 ">
+                                <DeleteComment commentId={comment.id} commentAuthor={comment.author} />
+                            </div>
+                        </div>
                         <div className="w-10/12">
                             <Divider
                                 style={{
@@ -143,7 +149,8 @@ const CommentsSection = ({ postId }) => {
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
                             placeholder="Ваш комментарий"
-                            autoSize={{minRows: 5, maxRows: 5}}/>
+                            autoSize={{minRows: 5, maxRows: 5}}
+                            style={{ whiteSpace: 'pre-wrap' }}/>
                     </>
 
                     <div className="justify-end py-5 flex ">

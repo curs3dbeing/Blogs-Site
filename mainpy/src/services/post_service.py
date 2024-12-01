@@ -4,7 +4,7 @@ from mainpy.src.tags.tag import tags_ids, Tag, TagName
 from mainpy.src.services.comment_service import delete_comment_by_id
 from mainpy.src.services.tag_service import get_tag_ID_by_names
 from sqlalchemy import text
-
+from uuid import UUID
 
 
 def add_post(post):
@@ -89,21 +89,21 @@ def get_post_tags_by_id(post_id):
                              post_created_at=result[2], views=result[6])
 
 
-def delete_post_by_post(post : Post):
+def delete_post_by_post(postid : UUID):
     connection = database.connect()
-    query = text("SELECT comment_id FROM comment_post WHERE post_id='{0}'".format(post.id))
+    query = text("SELECT comment_id FROM comment_post WHERE post_id='{0}'".format(postid))
     result = connection.execute(query).fetchall()
     for comment in result:
         delete_comment_by_id(comment[0])
-    query = text("DELETE FROM posts_tags where post_id='{0}'".format(post.id))
+    query = text("DELETE FROM posts_tags where post_id='{0}'".format(postid))
     connection.execute(query)
-    query = text("DELETE FROM pages_posts where post_id='{0}'".format(post.id))
+    query = text("DELETE FROM pages_posts where post_id='{0}'".format(postid))
     connection.execute(query)
-    query = text("DELETE FROM post_user_reaction where post_id='{0}'".format(post.id))
+    query = text("DELETE FROM post_user_reaction where post_id='{0}'".format(postid))
     connection.execute(query)
-    query = text("DELETE FROM user_post where idp='{0}'".format(post.id))
+    query = text("DELETE FROM user_post where idp='{0}'".format(postid))
     connection.execute(query)
-    query = text("DELETE FROM Posts where post_id='{0}'".format(post.id))
+    query = text("DELETE FROM Posts where post_id='{0}'".format(postid))
     connection.execute(query)
     connection.commit()
     connection.close()

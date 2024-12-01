@@ -1,7 +1,8 @@
 from sqlalchemy.exc import SQLAlchemyError
 
 from mainpy.src.security.security import create_access_token, oauth2_scheme
-from mainpy.src.users.user import User, get_current_user, get_current_active_user, UserModel, get_current_active_user_model
+from mainpy.src.users.user import User, get_current_user, get_current_active_user, UserModel, \
+    get_current_active_user_model, UserRoles
 from fastapi import APIRouter, HTTPException, Depends, Body
 from pydantic import ValidationError
 from enum import Enum
@@ -10,7 +11,8 @@ from jose import jwt, JWTError
 from mainpy.src.security.token import TokenData
 from mainpy.src.settings.settings import settings
 from mainpy.src.security.token import verify_token_func
-from mainpy.src.services.user_service import user_insert, get_user_by_login, match_password, update_password, get_user_by_id
+from mainpy.src.services.user_service import user_insert, get_user_by_login, match_password, update_password, \
+    get_user_by_id, get_usermodel_by_id, update_user_login, update_user_about, update_ban_user_by_id
 from mainpy.src.settings.settings import settings
 from datetime import timedelta
 from uuid import UUID
@@ -67,6 +69,18 @@ async def get_me(data : Annotated[TokenData,Depends(verify_token_func)]):
 async def get_user_model(current_user: UserModel = Depends(get_current_active_user_model)):
     return current_user
 
+@users_router.put("/profile_update_block/{userID}")
+async def update_block_user(userID : UUID,
+                            current_user: UserModel = Depends(get_current_active_user_model)):
+    if current_user.role != UserRoles.Admin:
+        return {"status": "Method not allowed"}
+    else:
+        try:
+            update_ban_user_by_id(userID)
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=e)
+    return {"status": "User Updated Successfully"}
+
 
 @users_router.post("/{current_user.id}/change_password")
 async def change_password(email: str,
@@ -84,11 +98,40 @@ async def change_password(email: str,
 @users_router.get("/user/username")
 async def get_author(auth_id: UUID):
     try:
-        user : UserModel | None = get_user_by_id(auth_id)
-        if user is None:
+        result = get_usermodel_by_id(auth_id)
+        if result is None:
             return {
                 "status": "User not found",
             }
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=e)
+    user : UserModel = UserModel(id=result.id,email=result.email,login=result.login,disabled=result.disabled,created_at=result.created_at,about=result.about, role=result.role)
     return user
+
+@users_router.put("/user/update_login")
+async def update_login(login: str | None,userid : UUID, current_user : UserModel = Depends(get_current_active_user_model)):
+    if current_user.id!=userid:
+        return {"status": "Method not allowed"}
+    if login is None:
+        return {"status": "No login"}
+    if login == "":
+        return {"status": "No login"}
+    else:
+        try:
+            update_user_login(login,userid)
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=e)
+        return {"status": "Login Updated Successfully"}
+
+@users_router.put("/user/update_about")
+async def update_about(about: str | None,userid : UUID, current_user : UserModel = Depends(get_current_active_user_model)):
+    if current_user.id!=userid:
+        return {"status": "Method not allowed"}
+    else:
+        if about is None:
+            return {"status" : "OK"}
+        try:
+            update_user_about(about,userid)
+        except SQLAlchemyError as e:
+            raise HTTPException(status_code=500, detail=e)
+        return {"status": "About Updated Successfully"}

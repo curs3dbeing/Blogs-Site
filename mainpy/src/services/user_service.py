@@ -4,6 +4,7 @@ from mainpy.src.security.security import verify
 from sqlalchemy import text
 from uuid import UUID
 
+
 def user_insert(user):
     connection = database.connect()
     no_user = get_user_by_login(user.login) is None
@@ -32,9 +33,23 @@ def get_user_id(login : str):
     uid = user.fetchone()[0]
     return uid
 
+def update_ban_user_by_id(userID: UUID):
+    connection = database.connect()
+    query = text("UPDATE Users SET disabled = not disabled WHERE id='{0}'".format(userID))
+    connection.execute(query)
+    connection.commit()
+    connection.close()
+
 def get_user_by_id(uid : UUID):
     connection = database.connect()
     query = text("SELECT * FROM Users WHERE id = '{0}'".format(uid))
+    user = connection.execute(query).one_or_none()
+    connection.close()
+    return user if not None else None
+
+def get_usermodel_by_id(uid : UUID):
+    connection = database.connect()
+    query = text("SELECT id,login,role,email,disabled,about,created_at FROM Users WHERE id = '{0}'".format(uid))
     user = connection.execute(query).one_or_none()
     connection.close()
     return user if not None else None
@@ -54,6 +69,46 @@ def update_password(uid: UUID, password: str):
     connection.commit()
     connection.close()
 
+def update_user_login(login, userID : UUID):
+    connection = database.connect()
+    query = text("UPDATE USERS SET login = '{0}' where id = '{1}'".format(login, userID))
+    connection.execute(query)
+    query = text("UPDATE comments SET author_username= '{0}' where author = '{1}'".format(login, userID))
+    connection.execute(query)
+    connection.commit()
+    connection.close()
+
+def update_user_about(about,userID : UUID):
+    connection = database.connect()
+    query = text("UPDATE USERS SET about = '{0}' where id = '{1}'".format(about, userID))
+    connection.execute(query)
+    connection.commit()
+    connection.close()
+
+def is_admin(userID : UUID):
+    connection = database.connect()
+    query = text("SELECT * FROM Users WHERE id = '{0}'".format(userID))
+    user = connection.execute(query).one_or_none()
+    if user is None:
+        return False
+    else:
+        if user.role.value != 'Admin':
+            return False
+        else:
+            return True
+
+def is_moderator(userID : UUID):
+    connection = database.connect()
+    query = text("SELECT * FROM Users WHERE id = '{0}'".format(userID))
+    user = connection.execute(query).one_or_none()
+    if user is None:
+        return False
+    else:
+        if user.role.value != 'Moderator':
+            return False
+        else:
+            return True
+
 def match_password(user, password : str) -> bool:
     if user is None:
         return False
@@ -69,7 +124,3 @@ def authenticate_user(username : str, password : str):
     if not verify(password,user.password):
         return False
     return user
-
-
-#def get_current_user(token: str = Depends(oauth2_scheme)):
-#    user=token_decode(token)

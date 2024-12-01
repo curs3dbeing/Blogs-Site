@@ -8,6 +8,7 @@ import { Content } from "antd/es/layout/layout.js";
 import "./PostPage.css";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import useAuth from "../hooks/useAuth.jsx";
+import DeletePost from "./DeletePost.jsx";
 
 const PostPage = () => {
     const { postId } = useParams();
@@ -79,7 +80,7 @@ const PostPage = () => {
     }, [postId, isAuthenticated]);
 
     if (loading) return <Spin size="large" />;
-    if (error) return <div>Error: {error}</div>;
+    if (error) return <p className="flex justify-center font-bold">Method not allowed</p>;
 
     return (
         <Layout className="h-full">
@@ -89,7 +90,9 @@ const PostPage = () => {
                     {post ? (
                         <div style={{ fontFamily: "Rubik", minHeight: 'fit-content' }}>
                             <h3>Автор : <a href={`/profile/${post.author}`}>{postAuthor?.login}</a></h3>
-                            <h1>{post.title}</h1>
+                            <div className="flex ">
+                                <h1>{post.title}</h1> <DeletePost/>
+                            </div>
                             <p className="font-bold" style={{ fontSize: '20px' }}>Тэги:
                                 {post.tags && post.tags.length > 0 ? (
                                     <>
