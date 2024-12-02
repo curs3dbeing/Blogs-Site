@@ -1,3 +1,5 @@
+from fastapi import HTTPException
+
 from mainpy.src.security.security import password_hash
 from mainpy.src.database.database import database
 from mainpy.src.security.security import verify
@@ -57,6 +59,18 @@ def get_user_by_id(uid : UUID):
     connection.close()
     return user if not None else None
 
+def get_user_verification_send(user):
+    connection = database.connect()
+    query = text("SELECT id,cypher,verificated FROM user_verification WHERE id = '{0}'".format(user.id))
+    result = connection.execute(query).one_or_none()
+    connection.close()
+    if result is None:
+        return
+    if result[2] == False:
+        raise HTTPException(status_code=402, detail="Verification is already send")
+    if result[2] == True:
+        raise HTTPException(status_code=403, detail="Already verified")
+
 def get_usermodel_by_id(uid : UUID):
     connection = database.connect()
     query = text("SELECT id,login,role,email,disabled,about,created_at FROM Users WHERE id = '{0}'".format(uid))
@@ -64,7 +78,7 @@ def get_usermodel_by_id(uid : UUID):
     connection.close()
     return user if not None else None
 
-def get_user_by_email(email : str) -> bool:
+def get_user_by_email(email : str):
     connection = database.connect()
     query = text("SELECT * FROM Users WHERE email = '{0}'".format(email))
     user = connection.execute(query).one_or_none()
@@ -73,6 +87,13 @@ def get_user_by_email(email : str) -> bool:
 
 def verificate_user_data(userid : UUID):
     connection = database.connect()
+    query = text("SELECT id,cypher,verificated FROM user_verification WHERE id = '{0}'".format(userid))
+    result = connection.execute(query).one_or_none()
+    if result[2] == True:
+        raise HTTPException(status_code=403, detail="Already verified")
+    query = text("UPDATE user_verification SET verificated = 'true' WHERE id = '{0}'".format(userid))
+    connection.execute(query)
+    connection.commit()
     query = text("UPDATE Users SET disabled = 'false' WHERE id = '{0}'".format(userid))
     connection.execute(query)
     connection.commit()

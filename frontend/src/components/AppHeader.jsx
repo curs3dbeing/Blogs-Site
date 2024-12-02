@@ -74,7 +74,7 @@ const AppHeader = () => {
                     </a>
                     <a className="text-3xl font-semibold hover:text-indigo-500 text-black" href='/'
                        style={{fontFamily: 'Rubik'}}>
-                        Website
+                        Posters
                     </a>
                     <div className="w-full">
                         <div className="grid grid-cols-2 gap-4 content-center items-center">
@@ -129,7 +129,7 @@ const AppHeader = () => {
                 </a>
                 <a className="text-3xl font-semibold hover:text-indigo-500 text-black" href='/'
                    style={{fontFamily: 'Rubik'}}>
-                    Website
+                    Posters
                 </a>
                 <div className="w-full">
                     <div className="grid grid-cols-3 gap-4 content-center items-center">

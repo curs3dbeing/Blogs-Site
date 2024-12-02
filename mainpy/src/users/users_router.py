@@ -1,6 +1,6 @@
 from sqlalchemy.exc import SQLAlchemyError
 import smtplib
-from mainpy.src.security.security import create_access_token, oauth2_scheme
+from mainpy.src.security.security import create_access_token, oauth2_scheme, password_hash
 from mainpy.src.users.user import User, get_current_user, get_current_active_user, UserModel, \
     get_current_active_user_model, UserRoles
 from fastapi import APIRouter, HTTPException, Depends, Body, Query
@@ -13,8 +13,8 @@ from mainpy.src.settings.settings import settings, Settings
 from mainpy.src.security.token import verify_token_func
 from mainpy.src.services.user_service import user_insert, get_user_by_login, match_password, update_password, \
     get_user_by_id, get_usermodel_by_id, update_user_login, update_user_about, update_ban_user_by_id, \
-    verificate_user_data, get_user_by_email
-from mainpy.src.mail_sender import send_verification_message
+    verificate_user_data, get_user_by_email, get_user_verification_send
+from mainpy.src.mail_sender import send_verification_message, send_changepassword_message
 from mainpy.src.settings.settings import settings
 from datetime import timedelta
 from uuid import UUID
@@ -85,17 +85,16 @@ async def update_block_user(userID : UUID,
     return {"status": "User Updated Successfully"}
 
 
-@users_router.post("/{current_user.id}/change_password")
-async def change_password(email: str,
-                          new_password: str,
-                          current_user: User = Depends(get_current_user)):
-    if email != current_user.email:
-        raise HTTPException(406,'Invalid email')
+@users_router.post("/change_password")
+async def change_password(email: str,password: str):
+    user = get_user_by_email(email)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
     else:
-        try:
-            update_password(current_user.id, new_password)
-        except SQLAlchemyError as e:
-            raise HTTPException(status_code=500, detail=e)
+        hashed_pass = password_hash(password)
+        if hashed_pass == user.password:
+            return {"status" : "Same password"}
+        update_password(user.id, password)
     return {"status": "Password Changed Successfully"}
 
 @users_router.get("/user/username")
@@ -151,10 +150,22 @@ async def check_login(login: str):
 @users_router.post("/send_verification/{userID}")
 async def send_verification(userID : UUID):
     user = get_user_by_id(userID)
+    get_user_verification_send(user)
     if user is None:
         raise HTTPException(407,'no user')
     send_verification_message(user.email, userID)
     return {"status" : "Email send"}
+
+@users_router.post("/change/password/")
+async def send_change_password(email : str):
+    user = get_user_by_email(email)
+    if user is None:
+        raise HTTPException(406,'No user')
+    else:
+        send_changepassword_message(email, user.id)
+    return {"status": "Email send"}
+
+
 
 @users_router.get("/verificate/{cypher}")
 async def verificate_user(cypher : str, user_id : UUID = Query(None)):

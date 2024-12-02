@@ -12,6 +12,8 @@ import PostPage from "./components/PostPage.jsx";
 import PostCreation from "./components/PostCreation.jsx";
 import ProfilePage from "./components/UserProfile.jsx";
 import LikedPosts from "./components/LikedPosts.jsx";
+import RefreshPassword from "./RefreshPassword.jsx";
+import ResetPass from "./ResetPass.jsx";
 
 
 function App() {
@@ -20,7 +22,7 @@ function App() {
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#e6e6e6'}}>
-        {location.pathname !== '/login' && location.pathname !=='/signup' && <AppHeader key = {location.pathname} />}
+        {location.pathname !== '/login' && location.pathname!=='/reset_password' && !location.pathname.startsWith('/change_password/') && location.pathname !=='/signup' && <AppHeader key = {location.pathname} />}
       <Content>
           <Layout.Content>
               <Routes>
@@ -32,6 +34,8 @@ function App() {
                   <Route path="/new_post" element={<PostCreation/>}/>
                   <Route path={"/profile/:userId"} element={<ProfilePage/>}/>
                   <Route path={"likes/:userId"} element={<LikedPosts/>}/>
+                  <Route path={"/change_password/:token"} element={<RefreshPassword/>}/>
+                  <Route path={"/reset_password"} element={<ResetPass/>}/>
               </Routes>
           </Layout.Content>
       </Content>

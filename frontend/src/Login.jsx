@@ -50,7 +50,7 @@ const Login = () => {
         <div style={{background: '#e6e6e6', width: '100%', height: '100vh', fontFamily: 'Rubik'}}>
             <div className="py-4" style={{display: 'flex', alignItems: 'center'}}>
                 <a href='/' className="px-12 text-3xl font-semibold hover:text-indigo-500 text-black" style={{ fontFamily: 'Rubik'}}>
-                    Website
+                    Posters
                 </a>
             </div>
             <div className="flex min-h-full flex-col px-6 py-12 lg:px-8">
@@ -82,7 +82,7 @@ const Login = () => {
                                 <label htmlFor="password"
                                        className="block text-sm font-medium text-gray-900">Пароль</label>
                                 <div className="text-sm">
-                                    <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Забыли
+                                    <a href="/reset_password" className="font-semibold text-indigo-600 hover:text-indigo-500">Забыли
                                         пароль?</a>
                                 </div>
                             </div>

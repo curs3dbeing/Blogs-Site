@@ -16,4 +16,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_LIFETIME: int = os.getenv('ACCESS_TOKEN_LIFETIME')
     #REFRESH_TOKEN_LIFETIME: int = os.getenv('REFRESH_TOKEN_LIFETIME')
 
+    SMTP_SERVER : str = os.getenv('SMTP_SERVER')
+    SMTP_PORT : int = os.getenv('SMTP_PORT')
+    SMTP_USER : str = os.getenv('SMTP_USER')
+    SMTP_PASSWORD : str = os.getenv('SMTP_PASSWORD')
+
 settings = Settings()

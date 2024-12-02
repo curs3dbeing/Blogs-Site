@@ -207,3 +207,10 @@ ON DELETE CASCADE;
 
 alter table comments
 add column comment_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+create table user_verification(
+id uuid,
+cypher text,
+verificated bool default 'false',
+foreign key (id) references users(id));
+
