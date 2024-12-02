@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import {message} from "antd";
 
 const Register = () => {
 
@@ -13,6 +14,22 @@ const Register = () => {
     // formData.append('username', username);
     // formData.append('password', password);
     // formData.append('email', email);
+
+    const sendVerificationLink = async (userData) => {
+        if (!userData) {
+            return null;
+        }
+        console.log(userData)
+        try {
+            const response = await axios.post(`http://localhost:8000/send_verification/${userData.id}`, {})
+            if (response.data.status === 'User not found') {
+                return null;
+            }
+        } catch (error) {
+            message.error("Ошибка при отправке письма с подтверждением на почту");
+        }
+    }
+
 
     const navigate = useNavigate();
 
@@ -68,13 +85,19 @@ const Register = () => {
                 }
             });
             if (response.status === 200) {
-                navigate('/login')
+                message.info('Подтвердите ваш аккаунт на почте')
+                await sendVerificationLink(response.data)
             } else {
                 const errorData = response.json();
                 setErrorMessage(errorData);
             }
             setErrorMessage('');
         } catch (error) {
+            console.log(error);
+            if (error.status === 406){
+                setErrorMessage('Пользователь с таким логином или почтой уже существует');
+                return;
+            }
             console.error('Ошибка при входе:', error);
             setErrorMessage('Неверное имя пользователя или пароль.');
         }

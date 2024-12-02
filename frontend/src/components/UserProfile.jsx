@@ -26,7 +26,6 @@ const UserProfile = () => {
                 headers: { token: `${token}` },
             });
             setUserData(response.data);
-            // Устанавливаем начальные значения для newUserData
             setNewUserData({
                 login: response.data.login,
                 email: response.data.email,
@@ -104,6 +103,28 @@ const UserProfile = () => {
             message.error('Имя пользователя должно содержать только английские буквы и цифры.');
             return;
         }
+
+        if(newUserData.login === userData.login && newUserData.about === userData.about) {
+            message.error('Вы не поменяли данные!')
+            return;
+        }
+
+        if(newUserData.login !== userData.login) {
+            try {
+                const params = {
+                    login: newUserData.login
+                }
+                await axios.get(`http://localhost:8000/check/login/`, {
+                    params
+                })
+            } catch (error) {
+                if (error.status === 406) {
+                    message.error("Введенный вами логин уже занят");
+                    return;
+                }
+            }
+        }
+
         try {
             await axios.put('http://localhost:8000/user/update_login', {}, {
                 params: { login: newUserData.login, userid: userData.id },

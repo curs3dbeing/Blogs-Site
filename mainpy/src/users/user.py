@@ -30,7 +30,7 @@ class User(BaseModel):
     created_at: datetime = Field(default_factory=datetime.now)
     role: UserRoles
     about: str | None = None
-    disabled: bool = Field(default=False)
+    disabled: bool = Field(default=True)
 
 class UserModel(BaseModel):
     id: UUID = Field(default_factory=uuid4)
@@ -99,6 +99,6 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     return current_user
 
 async def get_current_active_user_model(current_user:UserModel = Depends(get_current_user_model)) -> UserModel:
-    # if current_user.disabled
-    # raise HTTPException(status_code=400,detail="Inactive user")
+    if current_user.disabled:
+        raise HTTPException(status_code=400,detail="Inactive user")
     return current_user

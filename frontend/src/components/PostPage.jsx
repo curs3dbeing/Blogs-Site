@@ -85,7 +85,7 @@ const PostPage = () => {
     return (
         <Layout className="h-full">
             <Sider width={200} style={{ left: 0, backgroundColor: '#e6e6e6' }} />
-            <Layout style={{ marginLeft: 50 }}>
+            <Layout  style={{ marginLeft: 50 }}>
                 <Content style={{ padding: '24px', marginTop: 24 }}>
                     {post ? (
                         <div style={{ fontFamily: "Rubik", minHeight: 'fit-content' }}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import {message} from "antd";
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -11,7 +12,6 @@ const Login = () => {
     const formData = new URLSearchParams();
     formData.append('username', username);
     formData.append('password', password);
-
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -32,12 +32,15 @@ const Login = () => {
             if (response.status === 200) {
                 localStorage.setItem('access_token', response.data.access_token);
                 navigate('/posts')
-            } else {
-                const errorData = response.json();
-                setErrorMessage(errorData);
             }
             setErrorMessage('');
         } catch (error) {
+            console.log(error);
+            if(error.status === 400){
+                message.error('Ваш аккаунт заблокирован или неверифицирован на почте');
+                setErrorMessage('Ваш аккаунт заблокирован или неверифицирован на почте');
+                return;
+            }
             console.error('Ошибка при входе:', error);
             setErrorMessage('Неверное имя пользователя или пароль.');
         }

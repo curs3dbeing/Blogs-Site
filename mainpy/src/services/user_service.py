@@ -7,14 +7,24 @@ from uuid import UUID
 
 def user_insert(user):
     connection = database.connect()
-    no_user = get_user_by_login(user.login) is None
-    if no_user & get_user_by_email(user.email) is True:
-        query = text("INSERT INTO Users(id,login,password,role,email) values ('{0}', '{1}', '{2}', '{3}','{4}')".format(user.id, user.login, password_hash(user.password), user.role.value, user.email))
+    no_login_user = get_user_by_login(user.login)
+    no_email_user = get_user_by_email(user.email)
+    if (no_login_user is None) & (no_email_user is None):
+        query = text("INSERT INTO Users(id,login,password,role,email,disabled) values ('{0}', '{1}', '{2}', '{3}','{4}', '{5}')".format(user.id, user.login, password_hash(user.password), user.role.value, user.email, user.disabled))
         connection.execute(query)
         connection.commit()
         return user
     else:
         return None
+
+def user_login_exists(new_login):
+    connection = database.connect()
+    query = text("SELECT * FROM Users WHERE login = '{0}'".format(new_login))
+    result = connection.execute(query).one_or_none()
+    if result:
+        return True
+    else:
+        return False
 
 def get_user_by_login(login : str):
     connection = database.connect()
@@ -59,7 +69,14 @@ def get_user_by_email(email : str) -> bool:
     query = text("SELECT * FROM Users WHERE email = '{0}'".format(email))
     user = connection.execute(query).one_or_none()
     connection.close()
-    return user is None
+    return user
+
+def verificate_user_data(userid : UUID):
+    connection = database.connect()
+    query = text("UPDATE Users SET disabled = 'false' WHERE id = '{0}'".format(userid))
+    connection.execute(query)
+    connection.commit()
+    connection.close()
 
 def update_password(uid: UUID, password: str):
     hashed_pass = password_hash(password)

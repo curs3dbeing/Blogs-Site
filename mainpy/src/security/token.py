@@ -32,6 +32,8 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    if user.disabled == True:
+        raise HTTPException(status_code=400,detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_LIFETIME)
     access_token = create_access_token(
         data={"sub": str(user.id)}, expires_delta=access_token_expires
