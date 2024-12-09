@@ -37,8 +37,8 @@ def get_comments(post_id: UUID, offset : int) -> tuple[int, List[CommentInfo]]:
 
 def delete_comment_by_comment(comment: Comment):
     connection = database.connect()
-    query = text("DELETE FROM comment_post WHERE comment_id = '{0}'".format(comment.id))
-    connection.execute(query)
+    #query = text("DELETE FROM comment_post WHERE comment_id = '{0}'".format(comment.id))
+    #connection.execute(query)
     query = text("DELETE FROM comments WHERE comment_id = '{0}'".format(comment.id))
     connection.execute(query)
     connection.commit()

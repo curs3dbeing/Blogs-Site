@@ -9,10 +9,13 @@ import "./PostPage.css";
 import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import useAuth from "../hooks/useAuth.jsx";
 import DeletePost from "./DeletePost.jsx";
+import ExportComponent from "./ExportComponent.jsx";
+import SiderMenu from "./SiderMenu.jsx";
 
 const PostPage = () => {
     const { postId } = useParams();
     const [post, setPost] = useState(null);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [postLikes, setPostLikes] = useState(0);
@@ -20,6 +23,26 @@ const PostPage = () => {
     const [hasLiked, setHasLiked] = useState(false);
     const [postAuthor, setPostAuthor] = useState(null);
     const token = localStorage.getItem('access_token');
+
+    const getUser = async () => {
+        if (!isAuthenticated) {
+            return null;
+        }
+        try {
+            const response = await axios.get(`http://localhost:8000/users/user`, {
+                headers: { token: `${token}` },
+            });
+            if (response.status === 200) {
+                setUser(response.data);
+            }
+        } catch (error) {
+            console.log("No auth");
+        }
+    };
+
+    useEffect(() => {
+        getUser();
+    }, [isAuthenticated]);
 
     const handleLike = async () => {
         if (!isAuthenticated) {
@@ -84,7 +107,18 @@ const PostPage = () => {
 
     return (
         <Layout className="h-full">
-            <Sider width={200} style={{ left: 0, backgroundColor: '#e6e6e6' }} />
+            <Sider className="" width={256} style={{ left: 0, backgroundColor: '#e6e6e6' }}>
+                {user && user.role === "Admin" ? (
+                    <div className="sticky top-0">
+                        <SiderMenu post_id={postId}>
+                            <ExportComponent />
+                        </SiderMenu>
+                    </div>) : (
+                        <div>
+
+                        </div>
+                    )}
+            </Sider>
             <Layout  style={{ marginLeft: 50 }}>
                 <Content style={{ padding: '24px', marginTop: 24 }}>
                     {post ? (

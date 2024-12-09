@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import { Button, Modal, message } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Modal, message, Input } from 'antd';
 import { DeleteOutlined } from "@ant-design/icons";
 import useAuth from "../hooks/useAuth.jsx";
 import axios from 'axios';
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const DeletePost = () => {
     const { postId } = useParams();
@@ -12,18 +12,19 @@ const DeletePost = () => {
     const token = localStorage.getItem('access_token');
     const [user, setUser] = useState(null);
     const [postData, setPostData] = useState(null);
+    const [deletionReason, setDeletionReason] = useState(''); // Состояние для причины удаления
 
     const handleClick = () => {
         setIsModalVisible(true);
     };
 
-    const getUser = async() => {
+    const getUser = async () => {
         if (!isAuthenticated) {
             return null;
         }
         try {
-            const response =await axios.get(`http://localhost:8000/users/user`, {
-                headers: {token: `${token}`},
+            const response = await axios.get(`http://localhost:8000/users/user`, {
+                headers: { token: `${token}` },
             });
             if (response.status === 200) {
                 setUser(response.data);
@@ -45,7 +46,7 @@ const DeletePost = () => {
         } catch (error) {
             console.log("No post");
         }
-    }
+    };
 
     useEffect(() => {
         getPost();
@@ -55,30 +56,37 @@ const DeletePost = () => {
         getUser();
     }, [isAuthenticated]);
 
-
     const handleDelete = async () => {
         if (!isAuthenticated) {
             message.error('Вы должны быть авторизованы для удаления поста.');
             return;
         }
 
+        if (deletionReason.length < 5) {
+            message.error('Причина удаления должна содержать не менее 5 символов.');
+            return;
+        }
+
         try {
             await axios.delete(`http://localhost:8000/posts_delete/${postId}`, {
                 headers: { token: `${token}` },
+                data: { reason : deletionReason },
             });
             message.success('Пост успешно удален!');
         } catch (error) {
-            message.error('Ошибка при удалении поста: ' + error.message);
+            message.error('Ошибка при удалении поста: ' + 'пост уже удален');
         } finally {
             setIsModalVisible(false);
+            setDeletionReason('');
         }
     };
 
     const handleCancel = () => {
         setIsModalVisible(false);
+        setDeletionReason(''); // Сбрасываем причину при отмене
     };
 
-    if (isAuthenticated && user && postData && (user.id===postData.author || user.role==='Moderator' || user.role==='Admin')) {
+    if (isAuthenticated && user && postData && (user.id === postData.author || user.role === 'Moderator' || user.role === 'Admin')) {
         return (
             <>
                 <Button className="" style={{ color: 'Black', height: '24px' }} onClick={handleClick}>
@@ -90,6 +98,12 @@ const DeletePost = () => {
                     onOk={handleDelete}
                     onCancel={handleCancel}>
                     <p>Вы уверены, что хотите удалить этот пост?</p>
+                    <Input.TextArea
+                        rows={4}
+                        placeholder="Введите причину удаления"
+                        value={deletionReason}
+                        onChange={(e) => setDeletionReason(e.target.value)}
+                    />
                 </Modal>
             </>
         );

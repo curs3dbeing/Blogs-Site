@@ -37,7 +37,7 @@ const RefreshPassword = () => {
 
 
         if (!password || password.length > 15) {
-            setErrorMessage('Имя пользователя должно содержать максимум 15 символов.');
+            setErrorMessage('Пароль должен содержать максимум 15 символов.');
             return;
         }
 

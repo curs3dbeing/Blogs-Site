@@ -1,9 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Input, Button, message, Card, Space } from 'antd';
+import { Layout, Input, Button, message, Card, Space, Menu } from 'antd';
+import {
+    AppstoreOutlined,
+    FormOutlined,
+    MailOutlined,
+    PercentageOutlined, PieChartOutlined,
+    SettingOutlined, TableOutlined,
+    UserSwitchOutlined
+} from '@ant-design/icons';
 import axios from 'axios';
 import useAuth from "../hooks/useAuth.jsx";
 import { useParams } from "react-router-dom";
 import UpdateUserDisabled from "./UpdateUserDisabled.jsx";
+
+const items = [
+    {
+        key: 'sub1',
+        label: 'Загрузка отчетов',
+        icon: <MailOutlined />,
+        children: [
+            {
+                key: 'g1',
+                label: 'Отчеты по пользователям',
+                type: 'group',
+                children: [
+                    {
+                        key: '1',
+                        icon: <UserSwitchOutlined />,
+                        label: 'Динамика пользователей',
+                    },
+                    {
+                        key: '2',
+                        icon: <FormOutlined />,
+                        label: 'Активные пользователи',
+                    },
+                    {
+                        key: '3',
+                        icon: <PercentageOutlined />,
+                        label: 'Соотношение авторов',
+                    },
+                ],
+            },
+            {
+                key: 'g2',
+                label: 'Отчеты по публикациям',
+                type: 'group',
+                children: [
+                    {
+                        key: '4',
+                        icon: <TableOutlined />,
+                        label: 'Публикации по месяцам',
+                    },
+                    {
+                        key: '5',
+                        icon: <PieChartOutlined />,
+                        label: 'Наиболее популярные теги по месяцам',
+                    },
+                ],
+            },
+        ],
+    }
+];
 
 const UserProfile = () => {
     const { userId } = useParams();
@@ -14,6 +71,106 @@ const UserProfile = () => {
         email: '',
         about: ''
     });
+
+    const onClick  = async (e) => {
+        if (e.key === '1') {
+            try {
+                const response = await axios.get(`http://localhost:8000/users_each_month`, {
+                    headers: {token: `${token}`},
+                    responseType: 'blob',
+                });
+
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `registration.xlsx`);
+
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (error) {
+                message.error('Ошибка при экспорте:', error);
+            }
+        } else if (e.key=== '2') {
+            try {
+                const response = await axios.get(`http://localhost:8000/users_authors`, {
+                    headers: {token: `${token}`},
+                    responseType: 'blob',
+                });
+
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `active_users.xlsx`);
+
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (error) {
+                message.error('Ошибка при экспорте:', error);
+            }
+        } else if (e.key === '3') {
+            try {
+                const response = await axios.get(`http://localhost:8000/users_authors_percentage`, {
+                    headers: {token: `${token}`},
+                    responseType: 'blob',
+                });
+
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `authors_percentage.xlsx`);
+
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (error) {
+                message.error('Ошибка при экспорте:', error);
+            }
+        } else if (e.key === '4') {
+            try {
+                const response = await axios.get(`http://localhost:8000/posts_by_month`, {
+                    headers: {token: `${token}`},
+                    responseType: 'blob',
+                });
+
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `posts_by_month.xlsx`);
+
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (error) {
+                message.error('Ошибка при экспорте:', error);
+            }
+        } else if(e.key === '5') {
+            try {
+                const response = await axios.get(`http://localhost:8000/posts_by_tags`, {
+                    headers: {token: `${token}`},
+                    responseType: 'blob',
+                });
+
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `posts_by_tags_month.xlsx`);
+
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (error) {
+                message.error('Ошибка при экспорте:', error);
+            }
+        }
+    };
+
     const [profileData, setProfileData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -164,35 +321,57 @@ const UserProfile = () => {
                     <h1>Профиль пользователя</h1>
                     {isAuthenticated && userData ? (
                         userData.id === userId ? (
-                            <form className="w-1/2" onSubmit={handleSubmit}>
-                                <div className="py-4">
-                                    <label>Логин:</label>
-                                    <Input
-                                        name="login"
-                                        value={newUserData.login}
-                                        onChange={handleChange}
-                                    />
+                            <>
+                                <div className="flex grid-cols-2">
+                                    <form className="w-1/2" onSubmit={handleSubmit}>
+                                        <div className="py-4">
+                                            <label>Логин:</label>
+                                            <Input
+                                                name="login"
+                                                value={newUserData.login}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+                                        <div className="py-4">
+                                            <label>Электронная почта:</label>
+                                            <Input
+                                                name="email"
+                                                value={userData.email}
+                                                disabled
+                                            />
+                                        </div>
+                                        <div className="py-4">
+                                            <label>Информация о себе:</label>
+                                            <Input.TextArea
+                                                name="about"
+                                                value={newUserData.about}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+                                        <Button type="primary" htmlType="submit">
+                                            Сохранить изменения
+                                        </Button>
+                                    </form>
+                                    {userData.role === 'Admin' ? (
+                                    <div className="grid grid-cols-1 justify-center w-1/2 h-full">
+                                        <h2 className="flex justify-center">Отчетность</h2>
+                                        <div className="flex justify-center rounded-3xl">
+                                            <Menu
+
+                                                onClick={onClick}
+                                                style={{
+                                                    width: 350,
+                                                }}
+                                                defaultSelectedKeys={['1']}
+                                                defaultOpenKeys={['sub1']}
+                                                mode="inline"
+                                                items={items}
+                                            />
+                                        </div>
+                                    </div>
+                                    ) : (<> </>)}
                                 </div>
-                                <div className="py-4">
-                                    <label>Электронная почта:</label>
-                                    <Input
-                                        name="email"
-                                        value={userData.email}
-                                        disabled
-                                    />
-                                </div>
-                                <div className="py-4">
-                                    <label>Информация о себе:</label>
-                                    <Input.TextArea
-                                        name="about"
-                                        value={newUserData.about}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <Button type="primary" htmlType="submit">
-                                    Сохранить изменения
-                                </Button>
-                            </form>
+                            </>
                         ) : (
                             <div style={{ fontFamily: "Rubik" }}>
                                 <Space direction="vertical" size={25}>

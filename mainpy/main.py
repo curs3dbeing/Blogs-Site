@@ -6,6 +6,7 @@ from mainpy.src.reactions.reaction_router import reaction_router
 from mainpy.src.tags.tags_router import tags_router
 from mainpy.src.security.token import token_router
 from mainpy.src.pages.page_router import page_router
+from mainpy.src.administration.admin_router import admin_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -30,3 +31,4 @@ app.include_router(posts_router)
 app.include_router(comments_router)
 app.include_router(reaction_router)
 app.include_router(tags_router)
+app.include_router(admin_router)

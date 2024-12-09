@@ -1,9 +1,13 @@
+from fastapi import HTTPException
+
 from mainpy.src.database.database import database
 from mainpy.src.posts.post import Post, PostTags
 from mainpy.src.tags.tag import tags_ids, Tag, TagName
 from mainpy.src.services.comment_service import delete_comment_by_id
 from mainpy.src.services.tag_service import get_tag_ID_by_names
 from sqlalchemy import text
+import pandas as pd
+import re
 from uuid import UUID
 
 
@@ -55,6 +59,42 @@ def get_post_by_id(post_id):
         else:
             return Post(id=result[0], title=result[3], content=result[1], author=result[5], tags=None,post_created_at=result[2], views=result[6])
 
+def upload_csv_post(file):
+    df = pd.read_csv(file.file)
+    connection = database.connect()
+    print(df.iterrows())
+    try:
+        id = df.iloc[0][1]
+        title = df.iloc[1][1]
+        content = df.iloc[2][1]
+        author = df.iloc[3][1]
+        tags : list[Tag] = df.iloc[4][1]
+        tags = re.findall(r'id=(\d+)',tags)
+        tags = list(map(int, tags))
+        views = df.iloc[5][1]
+        post_created_at = df.iloc[6][1]
+        query = text("INSERT INTO posts (post_id, content,post_created_at,title,views) VALUES ('{0}', '{1}','{2}','{3}',{4})".format(id,content,post_created_at,title,views))
+        connection.execute(query)
+        for tag in tags:
+            query = text("INSERT INTO posts_tags (post_id,tag_id) VALUES ('{0}','{1}')".format(id,tag))
+            connection.execute(query)
+        query = text("INSERT INTO user_post (idu,idp) VALUES ('{0}','{1}')".format(author,id) )
+        connection.execute(query)
+        connection.commit()
+        return True
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=403, detail=str(e))
+    finally:
+        connection.close()
+
+def add_view(post_id):
+    connection = database.connect()
+    query = text("UPDATE Posts SET views=views+1 where post_id='{0}'".format(post_id))
+    connection.execute(query)
+    connection.commit()
+    connection.close()
+
 def get_post_tags_by_id(post_id):
     connection = database.connect()
     query = text(
@@ -65,13 +105,10 @@ def get_post_tags_by_id(post_id):
         "group by t1.post_id,idu "
         "having t1.post_id='{0}'".format(post_id))
     result = connection.execute(query).fetchone()
+    connection.close()
     if result is None:
         return None
     else:
-        query = text("UPDATE Posts SET views=views+1 where post_id='{0}'".format(post_id))
-        connection.execute(query)
-        connection.commit()
-        connection.close()
         tags = result[4]
         if tags == '{"(,)"}':
             return PostTags(id=result[0], title=result[3], content=result[1], author=result[5], tags=None,
@@ -88,22 +125,25 @@ def get_post_tags_by_id(post_id):
             return PostTags(id=result[0], title=result[3], content=result[1], author=result[5], tags=result_array,
                              post_created_at=result[2], views=result[6])
 
-
-def delete_post_by_post(postid : UUID):
+def delete_post_by_post(postid : UUID, current_user : UUID, reason : str):
     connection = database.connect()
-    query = text("SELECT comment_id FROM comment_post WHERE post_id='{0}'".format(postid))
-    result = connection.execute(query).fetchall()
-    for comment in result:
-        delete_comment_by_id(comment[0])
-    query = text("DELETE FROM posts_tags where post_id='{0}'".format(postid))
-    connection.execute(query)
-    query = text("DELETE FROM pages_posts where post_id='{0}'".format(postid))
-    connection.execute(query)
-    query = text("DELETE FROM post_user_reaction where post_id='{0}'".format(postid))
-    connection.execute(query)
-    query = text("DELETE FROM user_post where idp='{0}'".format(postid))
-    connection.execute(query)
+    #query = text("SELECT comment_id FROM comment_post WHERE post_id='{0}'".format(postid))
+    #result = connection.execute(query).fetchall()
+    #for comment in result:
+    #    delete_comment_by_id(comment[0])
+    #query = text("DELETE FROM posts_tags where post_id='{0}'".format(postid))
+    #connection.execute(query)
+    #query = text("DELETE FROM pages_posts where post_id='{0}'".format(postid))
+    #connection.execute(query)
+    #query = text("DELETE FROM post_user_reaction where post_id='{0}'".format(postid))
+    #connection.execute(query)
+    #query = text("DELETE FROM user_post where idp='{0}'".format(postid))
+    #connection.execute(query)
     query = text("DELETE FROM Posts where post_id='{0}'".format(postid))
+    connection.execute(query)
+    query = text("UPDATE posts_log SET who_deleted = '{0}' where post_id = '{1}'".format(current_user, postid))
+    connection.execute(query)
+    query = text("UPDATE posts_log SET reason = '{0}' where post_id = '{1}'".format(reason, postid))
     connection.execute(query)
     connection.commit()
     connection.close()

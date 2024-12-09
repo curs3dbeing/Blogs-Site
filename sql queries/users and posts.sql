@@ -12,6 +12,72 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 LastModified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 disabled bool default FALSE);
 
+alter table comment_post
+drop constraint fk_post
+
+alter table comment_post
+add constraint fk_post
+foreign key (post_id)
+references posts(post_id)
+on delete cascade;
+
+alter table comment_post
+add constraint fk_comment
+foreign key (comment_id)
+references comments(comment_id)
+on delete cascade;
+
+alter table post_user_reaction
+drop constraint fk_user;
+
+alter table post_user_reaction
+add constraint fk_postid
+foreign key (post_id)
+references posts(post_id)
+on delete cascade;
+
+alter table post_user_reaction
+add constraint fk_reactionid
+foreign key (reaction_id)
+references reactions(reaction_id)
+on delete cascade;
+
+alter table post_user_reaction
+add constraint fk_user
+foreign key (user_id)
+references users(id)
+on delete cascade;
+
+alter table posts_tags
+drop constraint fk_tagid;
+
+alter table posts_tags
+add constraint fk_postid
+foreign key(post_id)
+references posts(post_id)
+on delete cascade;
+
+alter table posts_tags
+add constraint fk_tagid
+foreign key (tag_id)
+references tags(tag_id)
+on delete cascade;
+
+alter table user_post
+drop constraint fk_userid;
+
+alter table user_post
+add constraint fk_postid
+foreign key (idp)
+references posts(post_id)
+on delete cascade;
+
+alter table user_post
+add constraint fk_userid
+foreign key (idu)
+references users(id)
+on delete cascade;
+
 alter table users
 add column about text;
 
@@ -74,6 +140,55 @@ before update on users
 for each row
 execute function modification_date_update();
 
+create or replace function save_deleted_posts()
+returns trigger as $$
+begin
+	insert into posts_log(post_id,content,post_created_at,title,views)
+	values (old.post_id,old.content,old.post_created_at,old.title,old.views);
+	update posts_log
+	set author = (select idu from user_post 
+				  where idp = old.post_id)
+	where post_id = old.post_id;
+	update posts_log
+	set tags = (select array_agg(tag_id) from posts_tags
+				where post_id = old.post_id
+				group by post_id)
+	where post_id = old.post_id;
+	update posts_log
+	set user_reacted = (select array_agg(user_id) from post_user_reaction
+				where post_id = old.post_id
+				group by post_id,reaction_id
+				having reaction_id=1)
+	where post_id = old.post_id;
+	return old;
+end;
+$$
+language plpgsql;
+
+
+drop trigger posts_delete on posts;
+
+create trigger posts_delete
+before delete on posts
+for each row
+execute function save_deleted_posts();
+
+create table posts_log (
+post_id uuid,
+content text,
+post_created_at timestamp,
+title varchar(100),
+views int,
+author uuid,
+tags integer[],
+deleted_at timestamp DEFAULT CURRENT_TIMESTAMP,
+who_deleted uuid,
+reason text,
+user_reacted uuid[]);
+
+drop table posts_log;
+
+select * from pg_constraint;
 
 
 -----------------------------------------------------------------------
@@ -213,4 +328,50 @@ id uuid,
 cypher text,
 verificated bool default 'false',
 foreign key (id) references users(id));
+
+------------------------------------------------------------------------------
+
+select date_trunc('month', created_at) as month, count(*) from users
+group by month
+
+SELECT TO_CHAR(created_at, 'TMMonth') as month, count(distinct id) as Users
+FROM users
+RIGHT JOIN user_post on users.id=user_post.idu
+WHERE created_at >= NOW() - INTERVAL '6 months'
+group by month
+
+select * from (
+SELECT TO_CHAR(created_at, 'TMMonth') as month, count(*) as Users
+FROM users
+WHERE created_at >= NOW() - INTERVAL '6 months'
+group by month
+) join (
+SELECT TO_CHAR(created_at, 'TMMonth') as month, count(distinct id) as authors
+FROM users
+RIGHT JOIN user_post on users.id=user_post.idu
+WHERE created_at >= NOW() - INTERVAL '6 months'
+group by month) using(month);
+
+SELECT TO_CHAR(post_created_at, 'TMMonth') as month, count(*) posts
+FROM posts
+WHERE post_created_at >= NOW() - INTERVAL '6 months'
+group by month
+
+SELECT month, array_agg(count) as array_count, array_agg(tags) as array_tags FROM (
+SELECT TO_CHAR(post_created_at, 'TMMonth') as month, count(*) as count, tag_name as tags
+FROM posts
+join posts_tags using(post_id)
+join tags using(tag_id)
+WHERE post_created_at >= NOW() - INTERVAL '6 months'
+group by month, tag_name)
+group by month
+
+
+SELECT TO_CHAR(created_at, 'TMMonth') as month, count(*) as Users
+FROM users
+RIGHT JOIN user_verification using(id)
+WHERE created_at >= NOW() - INTERVAL '6 months' AND verificated = 'true'
+group by month
+
+
 
