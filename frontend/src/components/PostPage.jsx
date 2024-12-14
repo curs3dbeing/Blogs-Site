@@ -67,7 +67,11 @@ const PostPage = () => {
             }
             setHasLiked(!hasLiked);
         } catch (err) {
-            message.error(err.message);
+            if (!hasLiked) {
+                message.error('Ошибка при добавлении реакции : родительский пост был удален');
+            } else {
+                message.error('Ошибка при удалении реакции : родительский пост был удален');
+            }
         }
     };
 

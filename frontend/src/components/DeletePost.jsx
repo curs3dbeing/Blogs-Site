@@ -3,7 +3,7 @@ import { Button, Modal, message, Input } from 'antd';
 import { DeleteOutlined } from "@ant-design/icons";
 import useAuth from "../hooks/useAuth.jsx";
 import axios from 'axios';
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 const DeletePost = () => {
     const { postId } = useParams();
@@ -12,7 +12,8 @@ const DeletePost = () => {
     const token = localStorage.getItem('access_token');
     const [user, setUser] = useState(null);
     const [postData, setPostData] = useState(null);
-    const [deletionReason, setDeletionReason] = useState(''); // Состояние для причины удаления
+    const [deletionReason, setDeletionReason] = useState('');
+    const navigate = useNavigate();
 
     const handleClick = () => {
         setIsModalVisible(true);
@@ -73,6 +74,9 @@ const DeletePost = () => {
                 data: { reason : deletionReason },
             });
             message.success('Пост успешно удален!');
+            setTimeout(() => {
+                navigate('/posts/');
+            }, 1000);
         } catch (error) {
             message.error('Ошибка при удалении поста: ' + 'пост уже удален');
         } finally {
@@ -83,7 +87,7 @@ const DeletePost = () => {
 
     const handleCancel = () => {
         setIsModalVisible(false);
-        setDeletionReason(''); // Сбрасываем причину при отмене
+        setDeletionReason('');
     };
 
     if (isAuthenticated && user && postData && (user.id === postData.author || user.role === 'Moderator' || user.role === 'Admin')) {

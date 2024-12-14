@@ -51,6 +51,13 @@ def delete_comment_by_id(ids: UUID):
     connection.commit()
     connection.close()
 
+def get_comment_by_id(ids: UUID):
+    connection = database.connect()
+    query = text("SELECT FROM comments WHERE comment_id = '{0}'".format(ids))
+    data = connection.execute(query).one_or_none()
+    connection.close()
+    return data
+
 def get_comment_author(comment: Comment):
     connection = database.connect()
     query = text("SELECT comment_author FROM comments WHERE comment_id = '{0}'".format(comment.id))

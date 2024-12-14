@@ -95,13 +95,11 @@ const AppHeader = () => {
                                     }
                                     trigger="click"
                                     open={open}
-                                    onOpenChange={handleOpenChange}
-                                >
+                                    onOpenChange={handleOpenChange}>
                                     <a
                                         className="text-stone-900 text-xl font-semibold hover:text-indigo-500 content-center"
                                         style={{ fontSize: '25px', fontFamily: 'Rubik' }}
-                                        onClick={handleRedirect}
-                                    >
+                                        onClick={handleRedirect}>
                                         Написать пост
                                     </a>
                                 </Popover>

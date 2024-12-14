@@ -15,7 +15,7 @@ from enum import Enum
 from uuid import UUID, uuid4
 import re
 
-email_regex=r'^[a-zA-Z0-9._%+-]+@(gmail|mail|rumbler|yandex|outlook|bsuir)\.[a-z]{2,3}$'
+email_regex=r'^[a-zA-Z0-9._%+-]+@(gmail|mail|rumbler|yandex|outlook)\.[a-z]{2,3}$'
 
 class UserRoles(str, Enum):
     Admin = 'Admin'
@@ -29,7 +29,7 @@ class User(BaseModel):
     email: str
     created_at: datetime = Field(default_factory=datetime.now)
     role: UserRoles
-    about: str | None = None
+    about: Annotated[str,Field(max_length=100)] | None = None
     disabled: bool = Field(default=True)
 
 class UserModel(BaseModel):
@@ -38,7 +38,7 @@ class UserModel(BaseModel):
     email: str
     created_at: datetime = Field(default_factory=datetime.now)
     role: UserRoles
-    about: str | None = None
+    about: Annotated[str,Field(max_length=100)] | None = None
     disabled: bool = Field(default=False)
 
     @property
@@ -58,6 +58,16 @@ class UserModel(BaseModel):
         if len(value) < login_min_len or len(value) > login_max_len:
             raise ValueError('Invalid login length')
         return value
+
+class UserLog(BaseModel):
+    id: UUID = Field(default_factory=uuid4)
+    login: str
+    email: str
+    created_at: datetime = Field(default_factory=datetime.now)
+    role: UserRoles
+    about: Annotated[str,Field(max_length=100)] | None = None
+    disabled: bool = Field(default=False)
+    modification_time: datetime = Field(default_factory=datetime.now)
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:

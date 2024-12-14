@@ -8,6 +8,8 @@ from io import BytesIO
 from mainpy.src.users.user import User, get_user_by_id, get_current_active_user_model
 from mainpy.src.services.administration_service import get_users_each_month, get_users_authors, get_user_and_authors, \
     get_posts_by_month, get_posts_each_tag
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 admin_router = APIRouter()
 
@@ -18,28 +20,40 @@ def is_admin(user_id):
     else:
         return False
 
+
 def create_excel_chart(data) -> BytesIO:
     wb = Workbook()
     ws = wb.active
 
+    # Заполнение данных
     ws.append(['Месяц', 'Пользователи'])
     for elem in data:
         ws.append([elem['month'], elem['users']])
 
+    months = np.array(range(len(data))).reshape(-1, 1)
+    users = np.array([elem['users'] for elem in data]).reshape(-1, 1)
+
+    model = LinearRegression()
+    model.fit(months, users)
+
+    next_month = np.array([[len(data)]])
+    forecast_users = model.predict(next_month)[0][0]
+
+    forecast_month = "Прогноз"
+    ws.append([forecast_month, round(forecast_users)])
 
     chart = BarChart()
     chart.title = "Регистрации пользователей"
     chart.x_axis.title = "Месяц"
     chart.y_axis.title = "Количество пользователей"
 
-    main_data = Reference(ws, min_col=2, min_row=1, max_row=len(data)+1)
-    categories = Reference(ws, min_col=1, min_row=2, max_row=len(data)+1)
-
+    main_data = Reference(ws, min_col=2, min_row=1, max_row=len(data) + 1 + 1)
+    categories = Reference(ws, min_col=1, min_row=2, max_row=len(data) + 1 + 1)
 
     chart.add_data(main_data, titles_from_data=True)
     chart.set_categories(categories)
 
-    chart.y_axis.min = 2
+    chart.y_axis.min = 0
     chart.y_axis.max = max(entry['users'] for entry in data) + 5
     chart.y_axis.major_tick_mark = "out"
 

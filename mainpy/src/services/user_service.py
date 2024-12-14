@@ -85,6 +85,13 @@ def get_user_by_email(email : str):
     connection.close()
     return user
 
+def get_user_log():
+    connection = database.connect()
+    query = text("SELECT * FROM Users_log")
+    data = connection.execute(query).mappings().fetchall()
+    connection.close()
+    return data
+
 def verificate_user_data(userid : UUID):
     connection = database.connect()
     query = text("SELECT id,cypher,verificated FROM user_verification WHERE id = '{0}'".format(userid))

@@ -7,7 +7,6 @@ from fastapi import APIRouter, HTTPException, Depends, Body, Query
 from pydantic import ValidationError
 from enum import Enum
 from typing import Annotated
-from jose import jwt, JWTError
 from mainpy.src.security.token import TokenData
 from mainpy.src.settings.settings import settings, Settings
 from mainpy.src.security.token import verify_token_func
@@ -133,6 +132,8 @@ async def update_about(about: str | None,userid : UUID, current_user : UserModel
         if about is None:
             return {"status" : "OK"}
         try:
+            if len(about) > 100:
+                raise HTTPException(status_code=407, detail='too long about')
             update_user_about(about,userid)
         except SQLAlchemyError as e:
             raise HTTPException(status_code=500, detail=e)

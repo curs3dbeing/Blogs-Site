@@ -33,6 +33,13 @@ def add_post(post):
     connection.commit()
     connection.close()
 
+def get_post_log():
+    connection = database.connect()
+    query = text("SELECT * FROM posts_log")
+    data = connection.execute(query).mappings().fetchall()
+    connection.close()
+    return data
+
 def get_post_by_id(post_id):
     connection = database.connect()
     query = text("SELECT DISTINCT t1.post_id,content,post_created_at,title, array_agg(tag_name),idu, views FROM Posts as t1 "
@@ -41,7 +48,7 @@ def get_post_by_id(post_id):
                 "LEFT JOIN tags as t4 on t4.tag_id=t2.tag_id "
                 "group by t1.post_id,idu "
                 "having t1.post_id='{0}'".format(post_id))
-    result = connection.execute(query).fetchone()
+    result = connection.execute(query).one_or_none()
     if result is None:
         return None
     else:

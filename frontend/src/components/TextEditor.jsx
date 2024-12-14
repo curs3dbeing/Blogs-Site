@@ -35,11 +35,11 @@ const TextEditor = ({ onChange }) => {
     }, [saveError]);
 
     const handleSave = async () => {
-        if (title.length <= 10 || title.length >= 100) {
+        if (title.trim().length <= 10 || title.trim().length >= 100) {
             setOpen(true);
             return;
         }
-        if(editorHtml === "") {
+        if(editorHtml.trim() === "") {
             setOpen(true);
             return;
         }
@@ -47,7 +47,7 @@ const TextEditor = ({ onChange }) => {
         try {
 
             const response = await axios.post('http://localhost:8000/create_post', {
-                title: title,
+                title: title.trim(),
                 content: editorHtml,
                 tags: selectedTags.map(tag => {
                     return {
@@ -73,7 +73,7 @@ const TextEditor = ({ onChange }) => {
             <div className="py-4">
                 <Popover
                     content={<a onClick={hide}>Закрыть</a>}
-                    title="Неверная длина названия!"
+                    title="Неверная длина публикации или ее названия!"
                     open={open}
                 >
                     <Input

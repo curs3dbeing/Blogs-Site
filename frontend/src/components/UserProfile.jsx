@@ -12,6 +12,7 @@ import axios from 'axios';
 import useAuth from "../hooks/useAuth.jsx";
 import { useParams } from "react-router-dom";
 import UpdateUserDisabled from "./UpdateUserDisabled.jsx";
+import TextareaAutosize from 'react-textarea-autosize';
 
 const items = [
     {
@@ -58,7 +59,23 @@ const items = [
                     },
                 ],
             },
-        ],
+            {
+                key: 'g3',
+                label: 'Экспорт логов',
+                type: 'group',
+                children: [
+                    {
+                        key: '6',
+                        icon: <TableOutlined />,
+                        label: 'Логи публикаций',
+                    },
+                    {
+                        key: '7',
+                        icon: <PieChartOutlined />,
+                        label: 'Логи пользователей',
+                    },
+                ],
+            },        ],
     }
 ];
 
@@ -168,6 +185,50 @@ const UserProfile = () => {
             } catch (error) {
                 message.error('Ошибка при экспорте:', error);
             }
+        } else if(e.key === '6') {
+            try {
+                const response = await axios.get(`http://localhost:8000/export/post_logs`, {
+                    headers: {token: `${token}`},
+                    responseType: 'blob',
+                });
+
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `posts_logs.csv`);
+
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (error) {
+                if (error.status === 403) {
+                    message.error('Запрещено')
+                }
+                message.error('Ошибка при экспорте:', error);
+            }
+        } else if(e.key === '7') {
+            try {
+                const response = await axios.get(`http://localhost:8000/export/users_log`, {
+                    headers: {token: `${token}`},
+                    responseType: 'blob',
+                });
+
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `users_logs.csv`);
+
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+            } catch (error) {
+                if (error.status === 403) {
+                    message.error('Запрещено')
+                }
+                message.error('Ошибка при экспорте:', error);
+            }
         }
     };
 
@@ -253,6 +314,11 @@ const UserProfile = () => {
 
         if (newUserData.login.length > 15) {
             message.error('Имя пользователя должно содержать максимум 15 символов.');
+            return;
+        }
+
+        if (newUserData.about.length > 100) {
+            message.error('Информация о себе может содержать максимум 100 символов.');
             return;
         }
 
@@ -342,10 +408,12 @@ const UserProfile = () => {
                                         </div>
                                         <div className="py-4">
                                             <label>Информация о себе:</label>
-                                            <Input.TextArea
+                                            <TextareaAutosize
                                                 name="about"
                                                 value={newUserData.about}
                                                 onChange={handleChange}
+                                                minRows={5}
+                                                style={{ width: '100%', fontFamily: 'Rubik' }}
                                             />
                                         </div>
                                         <Button type="primary" htmlType="submit">

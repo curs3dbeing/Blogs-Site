@@ -34,6 +34,10 @@ const ResetPass = () => {
             }
             setErrorMessage('');
         } catch (error) {
+            if (error.status === 406) {
+                setErrorMessage('Пользователя с такой почтой не существует.');
+                return;
+            }
             console.error('Ошибка при попытке смены пароля:', error);
             setErrorMessage('Ошибка при попытке смены пароля.');
         }

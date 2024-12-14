@@ -3,6 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from uuid import UUID
 
 from mainpy.src.reactions.reaction import Reaction, AllReactions
+from mainpy.src.services.post_service import get_post_by_id
 from mainpy.src.users.user import User, get_current_user, UserModel, get_current_active_user_model
 
 from mainpy.src.services.reaction_service import add_reaction_to_post, get_all_reactions_to_post, \
@@ -61,6 +62,9 @@ async def delete_reaction(post_id: UUID,
                           reaction: Reaction = Query(None),
                           current_user: UserModel = Depends(get_current_active_user_model)):
     try:
+        post = get_post_by_id(post_id)
+        if post is None:
+            raise HTTPException(status_code=404)
         delete_reaction_from_post(post_id, reaction, current_user.id)
     except SQLAlchemyError as e:
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=str(e))

@@ -41,6 +41,9 @@ const SiderMenu = ({post_id}) => {
 
             link.parentNode.removeChild(link);
         } catch (error) {
+            if(error.status === 404) {
+                message.error('Пост был удален')
+            }
             console.error('Ошибка при экспорте:', error);
         }
     };

@@ -27,7 +27,7 @@ const DeleteComment = ({commentId, commentAuthor}) => {
             })
             message.success('Комментарий успешно удален!');
         } catch (error) {
-            message.error('Ошибка при удалении комментария: ' + error.message);
+            message.error('Ошибка при удалении комментария: комментарий или пост был удален');
         } finally {
             setIsModalVisible(false);
         }

@@ -54,6 +54,7 @@ const CommentsSection = ({ postId }) => {
         }
 
         catch (error) {
+            message.error('Ошибка при добавлении комментария')
             messageApi.open({
                 type: 'error',
                 content: 'Ошибка при добавлении комментария',

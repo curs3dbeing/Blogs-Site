@@ -57,14 +57,19 @@ const Register = () => {
             return;
         }
 
+        if (!password || password.length < 8) {
+            setErrorMessage('Пароль должен содержать минимум 8 символов.');
+            return;
+        }
+
         if (!password || password.length > 15) {
-            setErrorMessage('Имя пользователя должно содержать максимум 15 символов.');
+            setErrorMessage('Пароль может содержать максимум 15 символов.');
             return;
         }
 
         const englishRegex = /^[A-Za-z0-9]+$/;
 
-        const emailRegex = /^[a-zA-Z0-9]{3,}@(gmail|mail|rumbler|yandex|outlook|bsuir).[a-z]{2,3}$/;
+        const emailRegex = /^[a-zA-Z0-9]{3,}@(gmail|mail|rumbler|yandex|outlook).[a-z]{2,3}$/;
 
         if(!emailRegex.test(email)) {
             setErrorMessage('Неверная почта')

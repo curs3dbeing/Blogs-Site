@@ -35,7 +35,9 @@ const UpdateUserDisabled = ({isDisabled, userID}) => {
         } finally {
             setIsModalVisible(false);
         }
-
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
     }
 
     const handleCancel = () => {
@@ -76,7 +78,7 @@ const UpdateUserDisabled = ({isDisabled, userID}) => {
                             <Button onClick={handleClick}> <UserAddOutlined /> </Button>
                         </div>
                         <Modal
-                            title="Подтверждение удаления"
+                            title="Подтверждение разблокировки"
                             visible={isModalVisible}
                             onOk={handleChangeBlock}
                             onCancel={handleCancel}>
@@ -89,7 +91,7 @@ const UpdateUserDisabled = ({isDisabled, userID}) => {
                             <Button onClick={handleClick}> <UserDeleteOutlined /> </Button>
                         </div>
                         <Modal
-                            title="Подтверждение удаления"
+                            title="Подтверждение блокировки"
                             visible={isModalVisible}
                             onOk={handleChangeBlock}
                             onCancel={handleCancel}>

@@ -34,6 +34,10 @@ const PostCreation = () => {
             });
 
             message.success(response.data.message || 'Файл успешно загружен!');
+            setTimeout(() => {
+                navigate('/posts/');
+            }, 1000);
+
         } catch (error) {
             if (error.status === 403){
                 message.error('Пост с таким id уже существует')

@@ -41,8 +41,8 @@ const RefreshPassword = () => {
             return;
         }
 
-        if(!password || password.length < 5) {
-            setErrorMessage('Пароль должен содержать минимум 6 символов.');
+        if(!password || password.length < 8) {
+            setErrorMessage('Пароль должен содержать минимум 8 символов.');
             return;
         }
         if(checkPassword !== password) {

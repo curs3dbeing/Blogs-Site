@@ -129,13 +129,15 @@ const LikedList = ({selectedTags, dateRange, searchQuery, sortViewsType}) => {
                             const username = author ? author.login : "No Author";
                             return (
                                 <Link key={post.id} to={`/posts/${post.id}`}> {}
-                                    <Card
-                                        className="shadow-lg h-50 cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
-                                    >
-                                        <Meta title={post.title} description={"Автор: "+username} />
-                                        <p className="mt-2">Просмотры: {post.views}</p>
-                                        <p className="text-gray-500 text-sm">Создан: {new Date(post.post_created_at).toLocaleString()}</p>
-                                    </Card>
+                                    <div className="items-center text-3xl font-semibold hover:text-indigo-500 text-black"
+                                        style={{background: '#e6e6e6', fontFamily: 'Rubik'}}>
+                                        <Card
+                                            className="shadow-lg h-50 cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                                            <Meta title={post.title} description={"Автор: "+username} />
+                                            <p className="mt-2">Просмотры: {post.views}</p>
+                                            <p className="text-gray-500 text-sm">Создан: {new Date(post.post_created_at).toLocaleString()}</p>
+                                        </Card>
+                                    </div>
                                 </Link>
                             );
                         })}
